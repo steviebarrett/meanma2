@@ -3,20 +3,24 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Entities\Dictionary;
 use App\Entities\DictionaryUser;
 use App\Entities\User;
 use App\Models\DictionaryModel;
 use App\Models\DictionaryUserModel;
 use App\Models\UserModel;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
+/**
+ * Class that provides methods to allow admins to administer users of their
+ * dictionaries
+ */
 class Users extends BaseController
 {
 	private $model;
 
 	public function __construct()
 	{
-		$this->model = new \App\Models\UserModel;
+		$this->model = new UserModel;
 	}
 
 	/**
@@ -26,9 +30,8 @@ class Users extends BaseController
 	 */
 	public function index()
 	{
-		$dictId = dictionary_id();
-
-		$users = $this->model->findByDictionaryId($dictId)
+		//Find the users of the current dictionary
+		$users = $this->model->findByDictionaryId(dictionary_id())
 			->orderBy('id')
 			->paginate(5, 'users');
 
@@ -38,6 +41,12 @@ class Users extends BaseController
 		]);
 	}
 
+	/**
+	 * Show user info
+	 *
+	 * @param int $id : the user ID
+	 * @return View
+	 */
 	public function show($id)
 	{
 		return view('Admin/Users/show', [
@@ -46,6 +55,11 @@ class Users extends BaseController
 		]);
 	}
 
+	/**
+	 * Show a new user form
+	 *
+	 * @return View
+	 */
 	public function new()
 	{
 		$user = new User;
@@ -55,9 +69,16 @@ class Users extends BaseController
 		]);
 	}
 
+	/**
+	 * Create a new user in the DB
+	 *
+	 * @return \CodeIgniter\HTTP\RedirectResponse
+	 * @throws \ReflectionException
+	 */
 	public function create()
 	{
-		$post = $this->request->getPost();
+		$post = $this->request->
+		getPost();
 
 		//fetch the access level for mapping the user to the dictionary
 		$accessLevel = $post['access_level'];
@@ -111,7 +132,12 @@ class Users extends BaseController
 		}
 	}
 
-	private function sendInvitationEmail(User $user)
+	/**
+	 * Send an invitation email to the user
+	 *
+	 * @param User $user
+	 */
+	private function sendInvitationEmail(User $user): void
 	{
 		$dictionaryModel = new DictionaryModel();
 		$dictionary = $dictionaryModel->getById(dictionary_id());
@@ -127,10 +153,15 @@ class Users extends BaseController
 		]);
 
 		$email->setMessage($message);
-
 		$email->send();
 	}
 
+	/**
+	 * Show the edit form for the user
+	 *
+	 * @param int $id : the user ID
+	 * @return View
+	 */
 	public function edit($id)
 	{
 		$user = $this->getUserOr404($id);
@@ -140,7 +171,13 @@ class Users extends BaseController
 		]);
 	}
 
-
+	/**
+	 * Update the user info
+	 *
+	 * @param int $id : user ID
+	 * @return \CodeIgniter\HTTP\RedirectResponse
+	 * @throws \ReflectionException
+	 */
 	public function update($id)
 	{
 		$user = $this->getUserOr404($id);
@@ -191,11 +228,12 @@ class Users extends BaseController
 
 	/**
 	 * Runs a check to see if a user with id = $id exists.
-	 * If it does then the UserModel object is returned
+	 * If it does then the User object is returned
 	 * Otherwise a PageNotFoundException is thrown to alert the user
 	 *
 	 * @param $id
-	 * @return UserModel $user
+	 * @return User $user
+	 * @throws PageNotFoundException
 	 */
 	private function getUserOr404($id)
 	{
@@ -203,7 +241,7 @@ class Users extends BaseController
 			->first();
 
 		if ($user === null) {
-			throw new \CodeIgniter\Exceptions\PageNotFoundException("User with id {$id} not found");
+			throw new PageNotFoundException("User with id {$id} not found");
 		}
 
 		return $user;

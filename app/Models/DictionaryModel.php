@@ -4,6 +4,9 @@ namespace App\Models;
 
 use App\Entities\Dictionary;
 
+/**
+ * Class that provides the CRUD methods required to work with the `dictionary` DB table
+ */
 class DictionaryModel extends \CodeIgniter\Model
 {
 	protected $table = 'dictionary';

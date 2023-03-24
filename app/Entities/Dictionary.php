@@ -2,6 +2,10 @@
 
 namespace App\Entities;
 
+/**
+ * Class that provides the means to work on an individual instance (entity) of
+ * the DictionaryModel
+ */
 class Dictionary extends \CodeIgniter\Entity\Entity
 {
 	/*

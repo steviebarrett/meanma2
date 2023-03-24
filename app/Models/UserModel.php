@@ -4,6 +4,9 @@ namespace App\Models;
 
 use \App\Libraries\Token;
 
+/**
+ * Class that provides the CRUD methods required to work with the `user` DB table
+ */
 class UserModel extends \CodeIgniter\Model
 {
 	protected $table = 'user';

@@ -5,28 +5,28 @@ namespace App\Entities;
 use \App\Libraries\Token;
 use App\Models\DictionaryModel;
 
+/**
+ * Class that provides the means to work on an individual instance (entity) of
+ * the UserModel
+ */
 class User extends \CodeIgniter\Entity\Entity
 {
 	public $reset_token;
 
+	/**
+	 * Checks if a password is correct
+	 *
+	 * @param string $password
+	 * @return bool
+	 */
 	public function verifyPassword($password)
 	{
 		return password_verify($password, $this->password_hash);
 	}
 
-	public function startActivation()
-	{
-		$token = new Token;
-		$this->token = $token->getValue();
-		$this->activation_hash = $token->getHash();
-	}
-
-	public function activate()
-	{
-		$this->is_active = true;
-		$this->activation_hash = null;
-	}
-
+	/**
+	 * Sets the values required for the password reset process
+	 */
 	public function startPasswordReset()
 	{
 		$token = new Token;
@@ -35,6 +35,9 @@ class User extends \CodeIgniter\Entity\Entity
 		$this->reset_expires_at = date('Y-m-d H:i:s', time() + 7200);
 	}
 
+	/**
+	 * Resets the values for password reset
+	 */
 	public function completePasswordReset()
 	{
 		$this->reset_hash = null;

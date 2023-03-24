@@ -6,7 +6,12 @@ use App\Controllers\BaseController;
 use App\Entities\User;
 use App\Models\DictionaryModel;
 use App\Models\UserModel;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
+/**
+ * Class that provides methods to allow superusers to administer all users
+ * and add new ones
+ */
 class Users extends BaseController
 {
 	private $model;
@@ -18,6 +23,10 @@ class Users extends BaseController
 		$this->dictionaryModel = new DictionaryModel();
 	}
 
+	/**
+	 * @param int $id : user ID
+	 * @return View
+	 */
 	public function show($id)
 	{
 		return view('SuperUser/Users/show', [
@@ -26,6 +35,11 @@ class Users extends BaseController
 		]);
 	}
 
+	/**
+	 * Show user info
+	 *
+	 * @return View
+	 */
 	public function new()
 	{
 		$user = new User;
@@ -36,6 +50,12 @@ class Users extends BaseController
 		]);
 	}
 
+	/**
+	 * Create a new user in the DB
+	 *
+	 * @return \CodeIgniter\HTTP\RedirectResponse
+	 * @throws \ReflectionException
+	 */
 	public function create()
 	{
 		$post = $this->request->getPost();
@@ -69,6 +89,12 @@ class Users extends BaseController
 		}
 	}
 
+	/**
+	 * Show the user edit form
+	 *
+	 * @param int $id : user ID
+	 * @return View
+	 */
 	public function edit($id)
 	{
 		$user = $this->getUserOr404($id);
@@ -79,7 +105,13 @@ class Users extends BaseController
 		]);
 	}
 
-
+	/**
+	 * Update the user info
+	 *
+	 * @param int $id : user ID
+	 * @return \CodeIgniter\HTTP\RedirectResponse
+	 * @throws \ReflectionException
+	 */
 	public function update($id)
 	{
 		$user = $this->getUserOr404($id);
@@ -134,6 +166,7 @@ class Users extends BaseController
 	 *
 	 * @param $id
 	 * @return User $user
+	 * @throws PageNotFoundException
 	 */
 	private function getUserOr404($id)
 	{
@@ -141,7 +174,7 @@ class Users extends BaseController
 			->first();
 
 		if ($user === null) {
-			throw new \CodeIgniter\Exceptions\PageNotFoundException("User with id {$id} not found");
+			throw new PageNotFoundException("User with id {$id} not found");
 		}
 
 		return $user;

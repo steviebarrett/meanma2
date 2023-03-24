@@ -5,16 +5,27 @@ namespace App\Controllers\SuperUser;
 use App\Controllers\BaseController;
 use App\Models\DictionaryModel;
 use App\Entities\Dictionary;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
+/**
+ * Class that provides methods to allow superusers to administer all dictionaries
+ * and add new ones
+ */
 class Dictionaries extends BaseController
 {
 	private $model;
 
 	public function __construct()
 	{
-		$this->model = new DictionaryModel();
+		$this->model = new DictionaryModel;
 	}
 
+	/**
+	 * Show dictionary info
+	 *
+	 * @param int $id : dictionary ID
+	 * @return View
+	 */
 	public function show($id)
 	{
 		return view('SuperUser/Dictionaries/show', [
@@ -22,6 +33,11 @@ class Dictionaries extends BaseController
 		]);
 	}
 
+	/**
+	 * Show new dictionary form
+	 *
+	 * @return View
+	 */
 	public function new()
 	{
 		$dictionary = new Dictionary;
@@ -31,6 +47,12 @@ class Dictionaries extends BaseController
 		]);
 	}
 
+	/**
+	 * Create a new dictionary in the DB
+	 *
+	 * @return \CodeIgniter\HTTP\RedirectResponse
+	 * @throws \ReflectionException
+	 */
 	public function create()
 	{
 		$post = $this->request->getPost();
@@ -52,6 +74,12 @@ class Dictionaries extends BaseController
 		}
 	}
 
+	/**
+	 * Show the dictionary edit form
+	 *
+	 * @param int $id : dictionary ID
+	 * @return View
+	 */
 	public function edit($id)
 	{
 		$dictionary = $this->getDictionaryOr404($id);
@@ -61,7 +89,13 @@ class Dictionaries extends BaseController
 		]);
 	}
 
-
+	/**
+	 * Update the dictionary info
+	 *
+	 * @param int $id : dictionary ID
+	 * @return \CodeIgniter\HTTP\RedirectResponse
+	 * @throws \ReflectionException
+	 */
 	public function update($id)
 	{
 		$dictionary = $this->getDictionaryOr404($id);
@@ -94,6 +128,7 @@ class Dictionaries extends BaseController
 	 *
 	 * @param $id
 	 * @return Dictionary $dictionary
+	 * @throws PageNotFoundException
 	 */
 	private function getDictionaryOr404($id)
 	{
