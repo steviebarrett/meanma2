@@ -2,6 +2,13 @@
 
 namespace App\Libraries;
 
+/**
+ * A class to generate and retrieve a random token for use when resetting a password
+ * in order to maintain security
+ *
+ * The getHash() method utilises the environment HASH_SECRET_KEY constant for increased security
+ *
+ */
 class Token
 {
 	private $token;

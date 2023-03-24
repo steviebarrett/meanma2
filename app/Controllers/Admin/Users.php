@@ -4,8 +4,10 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Entities\Dictionary;
+use App\Entities\DictionaryUser;
 use App\Entities\User;
 use App\Models\DictionaryModel;
+use App\Models\DictionaryUserModel;
 use App\Models\UserModel;
 
 class Users extends BaseController
@@ -63,6 +65,7 @@ class Users extends BaseController
 		//remove the access_level from the post data so the user can be created
 		unset($post['access_level']);
 		$user = new User($post);
+		$dictionaryUserModel = new DictionaryUserModel;
 
 		//if password is empty, create a random password for security
 		if ($user->password === null) {
@@ -72,9 +75,12 @@ class Users extends BaseController
 
 		//check if user already exists in the DB
 		if ($existingUser = $this->model->findByEmail($user->email)) {      //user already exist
+
 			//insert the dictionary_user data in the DB
-			$this->model->insertDictionaryUserRow(
-				dictionary_id(), $accessLevel, $existingUser->id);
+			$data = ['user_id' => $existingUser->id, 'dictionary_id' => dictionary_id(),
+				'access_level' => $accessLevel];
+			$dictionaryUserModel->save($data);
+
 			//send the invitiation email
 			$this->sendInvitationEmail($existingUser);
 			return redirect()->to("/admin/users/show/{$existingUser->id}")
@@ -84,7 +90,6 @@ class Users extends BaseController
 
 			$userId = $this->model->insertID;
 
-			//insert the dictionary_user data in the DB
 			$this->model->insertDictionaryUserRow(
 				dictionary_id(), $accessLevel);
 

@@ -8,7 +8,7 @@ class UserModel extends \CodeIgniter\Model
 {
 	protected $table = 'user';
 
-	protected $allowedFields = ['firstname', 'lastname', 'email', 'password', 'activation_hash',
+	protected $allowedFields = ['firstname', 'lastname', 'email', 'password',
 		'reset_hash', 'is_superuser', 'reset_expires_at', 'last_logged_in_at'];
 
 	protected $returnType = 'App\Entities\User';
@@ -32,10 +32,16 @@ class UserModel extends \CodeIgniter\Model
 			'matches' => 'Passwords don\'t match'
 		]];
 
+	//model events that calls hashPassword
 	protected $beforeInsert = ['hashPassword'];
-
 	protected $beforeUpdate = ['hashPassword'];
 
+	/**
+	 * Securely hashes the password for storage in the DB
+	 *
+	 * @param array $data
+	 * @return array
+	 */
 	protected function hashPassword(array $data)
 	{
 		if (isset($data['data']['password'])) {
@@ -85,40 +91,26 @@ class UserModel extends \CodeIgniter\Model
 		unset($this->validationRules['password_confirm']);
 	}
 
-	public function activateByToken($token)
-	{
-		$token = new Token($token);
-
-		$token_hash = $token->getHash();
-
-		$user = $this->where('activation_hash', $token_hash)
-			->first();
-
-		if ($user !== null) {
-
-			$user->activate();
-
-			$this->protect(false)->save($user);
-		}
-	}
-
+	/**
+	 * Fetches the User object for a given token
+	 *
+	 * Used for password reset
+	 *
+	 * @param Token $token
+	 * @return User
+	 */
 	public function getUserForPasswordReset($token)
 	{
 		$token = new Token($token);
-
 		$token_hash = $token->getHash();
-
 		$user = $this->where('reset_hash', $token_hash)
 			->first();
 
 		if ($user) {
-
 			if ($user->reset_expires_at < date('Y-m-d H:i:s')) {    //expired
-
 				$user = null;
 			}
 		}
-
 		return $user;
 	}
 
@@ -154,15 +146,17 @@ SQL;
 		$this->db->query($sql);
 	}
 
+
 	/**
-	 * Updated the access_level column in the `dictionary_user` table
+	 * Updates the access_level column in the `dictionary_user` table
+	 *
 	 * @param int $id : the user ID
 	 * @param int $dictionaryId
 	 * @param int $accessLevel
 	 */
-	public function updateDictionaryUserAccessLevel(int $id, int $dictionaryId, int $accessLevel): void
+	public function updateDictionaryUserAccessLevel(int $userId, int $dictionaryId, int $accessLevel): void
 	{
-		$userId = esc($id);
+		$userId = esc($userId);
 		$dictionaryId = esc($dictionaryId);
 		$accessLevel = esc($accessLevel);
 		$sql = <<<SQL
@@ -171,4 +165,6 @@ SQL;
 SQL;
 		$this->db->query($sql);
 	}
+
+
 }

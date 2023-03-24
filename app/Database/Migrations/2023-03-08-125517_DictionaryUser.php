@@ -28,8 +28,11 @@ class DictionaryUser extends Migration
 			    'default'       => '10'
 		    ]
 	    ]);
-	    $this->forge->addForeignKey('user_id', 'user', 'id', 'CASCADE', 'CASCADE', 'user_id_fk');
+
 	    $this->forge->addForeignKey('dictionary_id', 'dictionary', 'id', 'CASCADE', 'CASCADE', 'dictionary_id_fk');
+	    $this->forge->addForeignKey('user_id', 'user', 'id', 'CASCADE', 'CASCADE', 'user_id_fk');
+
+	    $this->forge->addPrimaryKey(['dictionary_id', 'user_id'], 'du_pk');
 
 	    $this->forge->createTable('dictionary_user');
     }

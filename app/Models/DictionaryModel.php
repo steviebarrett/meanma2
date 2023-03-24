@@ -33,7 +33,7 @@ class DictionaryModel extends \CodeIgniter\Model
 		$currentUser = service('auth')->getCurrentUser();
 
 		//Superuser, so set the access_level to admin value and attach to dictionary
-		if ($currentUser->is_superuser) {
+		if ($userId === null && $currentUser->is_superuser) {
 			$dictionary = $this->select('dictionary.*')
 				->where(['id' => $id])
 				->first();
