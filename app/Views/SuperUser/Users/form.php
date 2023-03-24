@@ -10,17 +10,20 @@
 	<label class="form-label" for="email">Email</label>
 	<input class="form-control" type="text" id="email" name="email" value="<?= old('email', esc($user->email)) ?>">
 </div>
-<div class="mb-3">
-	<label class="form-label" for="password">Password</label>
-	<input class="form-control" type="password" id="password" name="password">
-	<?php if ($user->id): ?>
-		<p><small>Leave blank to keep existing password</small></p>
-	<?php endif; ?>
-</div>
-<div class="mb-3">
-	<label class="form-label" for="password_confirm">Confirm Password</label>
-	<input class="form-control" type="password" id="password_confirm" name="password_confirm">
-</div>
+
+<?php if($user->id === current_user()->id): ?>
+	<div class="mb-3">
+		<label class="form-label" for="password">Password</label>
+		<input class="form-control" type="password" id="password" name="password">
+	  <?php if ($user->id): ?>
+				<p><small>Leave blank to keep existing password</small></p>
+	  <?php endif; ?>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="password_confirm">Confirm Password</label>
+		<input class="form-control" type="password" id="password_confirm" name="password_confirm">
+	</div>
+<?php endif; ?>
 
 <div class="form-check mb-3">
 	  <?php if ($user->id == current_user()->id): ?>
@@ -92,6 +95,7 @@
 		</div>
 	</div>
 </div>
+
 
 <div id="access_level_container" class="mb-3 d-none">
 	<div class="row">

@@ -77,8 +77,7 @@ class Users extends BaseController
 	 */
 	public function create()
 	{
-		$post = $this->request->
-		getPost();
+		$post = $this->request->getPost();
 
 		//fetch the access level for mapping the user to the dictionary
 		$accessLevel = $post['access_level'];
@@ -86,7 +85,6 @@ class Users extends BaseController
 		//remove the access_level from the post data so the user can be created
 		unset($post['access_level']);
 		$user = new User($post);
-		$dictionaryUserModel = new DictionaryUserModel;
 
 		//if password is empty, create a random password for security
 		if ($user->password === null) {
@@ -97,10 +95,9 @@ class Users extends BaseController
 		//check if user already exists in the DB
 		if ($existingUser = $this->model->findByEmail($user->email)) {      //user already exist
 
-			//insert the dictionary_user data in the DB
-			$data = ['user_id' => $existingUser->id, 'dictionary_id' => dictionary_id(),
-				'access_level' => $accessLevel];
-			$dictionaryUserModel->save($data);
+			//update the dictionary_user data in the DB
+			$this->model->updateDictionaryUserAccessLevel(
+				$existingUser->id, dictionary_id(), $accessLevel);
 
 			//send the invitiation email
 			$this->sendInvitationEmail($existingUser);
@@ -111,6 +108,7 @@ class Users extends BaseController
 
 			$userId = $this->model->insertID;
 
+			//insert the dictionary_user data in the DB
 			$this->model->insertDictionaryUserRow(
 				dictionary_id(), $accessLevel);
 

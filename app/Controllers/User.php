@@ -17,8 +17,8 @@ class User extends BaseController
 		}
 		if (current_user()->is_superuser) {     //return the superuser homepage view
 
-			//set a default dictionary id
-			dictionary_set_id(1);       //TODO: replace the hardcoded value here
+			$dictionaryId = dictionary_id() ?? 1;   //TODO: replace the hardcoded value here
+			dictionary_set_id($dictionaryId);
 
 			$dictionaryModel = new DictionaryModel();
 			$dictionaries = $dictionaryModel
